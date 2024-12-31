@@ -1,0 +1,55 @@
+local Players = game:GetService("Players")
+
+-- Function to create a name tag
+local function createNameTag(character, playerName)
+    if character:FindFirstChild("Head") and not character:FindFirstChild("NameTag") then
+        local head = character:FindFirstChild("Head")
+
+        -- Create a BillboardGui
+        local billboardGui = Instance.new("BillboardGui")
+        billboardGui.Name = "NameTag"
+        billboardGui.Size = UDim2.new(4, 0, 1, 0)
+        billboardGui.StudsOffset = Vector3.new(0, 2, 0)
+        billboardGui.Adornee = head
+        billboardGui.AlwaysOnTop = true
+        billboardGui.Parent = character
+
+        -- Create a TextLabel inside the BillboardGui
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Size = UDim2.new(1, 0, 1, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.Text = playerName
+        textLabel.TextColor3 = Color3.new(1, 1, 1) -- White color
+        textLabel.TextScaled = true
+        textLabel.Font = Enum.Font.SourceSansBold
+        textLabel.Parent = billboardGui
+    end
+end
+
+-- Function to handle a player's character
+local function setupCharacter(character, player)
+    createNameTag(character, player.Name)
+end
+
+-- Setup name tags for all players
+local function setupAllPlayers()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player.Character then
+            setupCharacter(player.Character, player)
+        end
+
+        player.CharacterAdded:Connect(function(character)
+            setupCharacter(character, player)
+        end)
+    end
+end
+
+-- Handle new players joining
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        setupCharacter(character, player)
+    end)
+end)
+
+-- Initialize for all current players
+setupAllPlayers()
